@@ -30,6 +30,9 @@ Skrypt używa WMI (Windows Management Instrumentation) do pobrania obiektu serwi
 Na końcu skrypt używa polecenia Get-Service w celu sprawdzenia stanu serwisu i wyświetlenia informacji o nim.
 </details>
 
+## Aby uruchomić serwis
+W PowerShell wpisz: `sc.exe start RunService`
+
 ## Uwagi
 Przed uruchomieniem skryptu upewnij się, że masz odpowiednie uprawnienia administratora.
 
