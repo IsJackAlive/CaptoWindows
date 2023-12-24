@@ -1,26 +1,4 @@
-# Tworzenie certyfikatu "pscertservice"
-$cert = New-SelfSignedCertificate -CertStoreLocation "Cert:\LocalMachine\My" -DnsName "pscertservice" -Type CodeSigning
-$certThumbprint = $cert.Thumbprint
-
-# Sprawdzenie czy certyfikat został utworzony
-if (!$cert) {
-    Write-Host "Certyfikat nie został utworzony"
-    return
-}
-
-# Eksport certyfikatu do pliku PFX
-$pwd = ConvertTo-SecureString -String 'Test123#' -AsPlainText -Force
-$certPath = "Cert:\LocalMachine\My\" + $cert.Thumbprint
-Export-PfxCertificate -Cert $certPath -FilePath "c:\temp\pscertservice.pfx" -Password $pwd
-
-# Wyświetlanie informacji o certyfikacie
-Write-Host "Certyfikat został utworzony. Thumbprint: $certThumbprint"
-
-<#  (OPCJONALNIE)
-    Przeniesienie certyfikatu do zaufanych certyfikatów administratora
-    https://scottstoecker.wordpress.com/2020/04/17/powershell-creating-a-certificate-in-the-root/   #>
-Move-Item (Join-Path Cert:\LocalMachine\My $certThumbprint) -Destination Cert:\LocalMachine\Root
-
+<# PS version: 5.1.19041.3031 #>
 # Tworzenie usługi
 $serviceName = "CertService"
 $serviceDisplayName = "Cert Service"
@@ -31,14 +9,12 @@ using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Timers;
-using System.Security.Cryptography.X509Certificates;
 
 namespace powerShellService
 {
     public class pShellService : ServiceBase
     {
         private System.Timers.Timer serviceTimer;
-        private X509Certificate2 codeSigningCertificate;
 
         public pShellService()
         {
@@ -55,9 +31,6 @@ namespace powerShellService
             serviceTimer.Elapsed += CheckForCalculator;
             serviceTimer.AutoReset = true;
             serviceTimer.Enabled = true;
-
-            // Wczytaj certyfikat do podpisywania
-            codeSigningCertificate = GetCertificateByThumbprint("$certThumbprint");
         }
 
         private void CheckForCalculator(object sender, ElapsedEventArgs e)
@@ -84,22 +57,6 @@ namespace powerShellService
             ServiceBase.Run(new pShellService());
         }
 
-        private X509Certificate2 GetCertificateByThumbprint(string thumbprint)
-        {
-            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-            store.Open(OpenFlags.ReadOnly);
-            X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-            store.Close();
-
-            if (certCollection.Count > 0)
-            {
-                return certCollection[0];
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 }
 "@
@@ -108,22 +65,63 @@ namespace powerShellService
 $serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.cs"
 $serviceCode | Out-File -FilePath $serviceCodePath -Encoding UTF8
 
-# Kompilowanie kodu C# do pliku wykonywalnego .exe
+# Tworzenie ścieżki do pliku wykonywalnego (.exe)
 $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
+
+# Parametry kompilacji
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
     ReferencedAssemblies = "System.ServiceProcess.dll", "System.dll", "System.Configuration.Install.dll"
 }
+
+# Kompilacja kodu do pliku wykonywalnego (.exe)
 Add-Type @compilerParams
 
-$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
+# Tworzenie samopodpisanego certyfikatu "pscertservice" używać wyłącznie w celach testowych
+$cert = New-SelfSignedCertificate -CertStoreLocation "Cert:\LocalMachine\My" -DnsName "pscertservice" -Type CodeSigning
+$certThumbprint = $cert.Thumbprint
+
+<#  Przeniesienie certyfikatu do zaufanych certyfikatów administratora
+    "you can’t directly create a certificate in the Root folder": https://scottstoecker.wordpress.com/2020/04/17/powershell-creating-a-certificate-in-the-root/   #>
+Move-Item (Join-Path Cert:\LocalMachine\My $certThumbprint) -Destination Cert:\LocalMachine\Root
+
+# Funkcja do podpisywania pliku kodu
+function SignCode {
+    param (
+        [string]$FilePath
+    )
+
+    try {
+        $certPath = "Cert:\LocalMachine\Root\" + $certThumbprint
+        $cert = Get-Item -LiteralPath $certPath
+
+        if ($cert -ne $null) {
+            $authenticodeSignature = Get-AuthenticodeSignature -FilePath $FilePath -ErrorAction Stop
+
+            if ($authenticodeSignature.Status -eq 'NotSigned') {
+                Set-AuthenticodeSignature -Certificate $cert -FilePath $FilePath -ErrorAction Stop
+                Write-Host "Plik podpisany pomyślnie."
+            } else {
+                Write-Host "Plik jest już podpisany."
+            }
+        } else {
+            Write-Host "Błąd: Nie można znaleźć certyfikatu o podanym thumbprint."
+        }
+    }
+    catch {
+        Write-Host "Błąd podpisywania pliku: $_"
+    }
+}
+
+# Podpisywanie pliku wykonywalnego
+SignCode $assemblyPath
 
 # Sprawdź, czy plik .exe ma certyfikat
 $cert = Get-AuthenticodeSignature -FilePath $assemblyPath
 
 if ($cert) {
-    Write-Host "Usługa '$serviceName.exe' jest podpisana certyfikatem. `n"
+    Write-Host "Usługa '$serviceName.exe' jest podpisana certyfikatem. `nCertyfikat Podpisany przez: $($cert.SignerCertificate.Subject)"
 } else {
     Write-Host "Usługa '$serviceName.exe' nie jest podpisana certyfikatem. `n"
     return
