@@ -111,7 +111,7 @@ unsigned long CALLBACK SvcTimer(void* param)
 		OutputDebugString(strMsg);
 
 		dwResult = PowerShellService();
-		_stprintf_s(strMsg, _countof(strMsg), _T("[GTSVC] PowerShellService() returned %d"), dwResult);
+		_stprintf_s(strMsg, _countof(strMsg), _T("[CaptoPs] PowerShellService() returned %d"), dwResult);
 		OutputDebugString(strMsg);
 
 		Sleep(SLEEPDELAYMS);
