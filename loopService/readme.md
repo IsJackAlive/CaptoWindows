@@ -21,4 +21,12 @@ sc.exe config Loop1Service depend= Loop2Service
 2. **Loop2Service.ps1**
     - Tworzy plik `C:\\SystemInfo.txt`, który może zawierać: Informacje o kontach użytkowników, grupach, uprawnieniach oraz datę ostatniej aktualizacji systemu
 
+3. **Loop3Service.ps1**
+    - Pusty serwis
+
+4. **Loop4Service.ps1**
+    - Pusty serwis
+
 </details>
+
+<img alt="CertService - parent Loop1 Service" src=".scs/1.png">

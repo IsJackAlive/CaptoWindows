@@ -1,10 +1,4 @@
-<#
-# Ustaw zależność serwisu Loop2 od serwisu Loop1
-sc.exe config Loop2Service depend= Loop1Service
-
-# Ustaw zależność serwisu Loop1 od serwisu Loop2
-sc.exe config Loop1Service depend= Loop2Service
-#>
+# Informacje o kontach użytkowników, grupach, uprawnieniach oraz datę ostatniej aktualizacji systemu w pliku C:\SystemInfo.txt
 
 # Tworzenie usługi
 $serviceName = "Loop2Service"
@@ -133,16 +127,18 @@ namespace powerShellService
 $serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.cs"
 $serviceCode | Out-File -FilePath $serviceCodePath -Encoding UTF8
 
-# Kompilowanie kodu C# do pliku wykonywalnego .exe
+# Tworzenie ścieżki do pliku wykonywalnego (.exe)
 $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
+
+# Parametry kompilacji
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
     ReferencedAssemblies = "System.ServiceProcess.dll", "System.dll", "System.Configuration.Install.dll"
 }
-Add-Type @compilerParams
 
-$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
+# Kompilacja kodu do pliku wykonywalnego (.exe)
+Add-Type @compilerParams
 
 # Dodawanie serwisu do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
@@ -150,5 +146,8 @@ Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$
 
 # Sprawdzanie stanu serwisu
 Get-Service -Name $serviceName | Select-Object Name, Status
+
+# Dodanie zależności Loop2Service od Loop1Service
+Start-Process -FilePath "sc.exe" -ArgumentList "config $serviceName depend= Loop1Service" -NoNewWindow -Wait
 
 Write-Host "Aby uruchomić wpisz: sc.exe start $serviceName `nJeśli wystąpiły błędy usuń za pomocą: sc.exe delete $serviceName"
