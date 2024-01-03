@@ -26,6 +26,8 @@ deletecert.exe C:\test\dll-gt-svc.dll
 deletecert.exe C:\test\dll-ps0.dll
 ```
 
+<img alt="" src=".scs/1.png">
+
 ## Wprowadzone Zmiany
 Dokonałem następującej zmiany, aby używać bezpieczniejszej funkcji wcsncpy_s:
 

@@ -56,8 +56,6 @@ sc.exe start CertService
 
 Przed uruchomieniem skryptu upewnij się, że masz odpowiednie uprawnienia administratora.
 
-**utwórz na dysku c folder `temp`**
-
 To jest dokumentacja dla skryptu "CertService.ps1", która opisuje kroki do utworzenia i uruchomienia serwisu systemowego w systemie Windows za pomocą języka C# i PowerShell.
 
 Skrypt można dostosować do własnych potrzeb i użyć go jako przykładu do tworzenia własnych serwisów systemowych.
@@ -74,3 +72,9 @@ Utworzony certyfikat:
 
 cmd: `certlm` -> `Zaufane główne urzędy certyfikacji\Certyfikaty` <br>
 folder: `c:\temp\`
+
+# Skrypt AddCert.ps1
+
+Skrypt wykorzystuje utworzony przez CertService podpis cyfrowy, do podpisania biblioteki `dll-ps0.dll` (psSession0).
+
+<img alt="AddCert" src=".scs/1.png">

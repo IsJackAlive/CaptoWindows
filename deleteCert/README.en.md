@@ -23,6 +23,8 @@ The compiled exe file size is  122 KB / 124 928 B.
 deletecert.exe C:\test\dll-gt-svc.dll
 deletecert.exe C:\test\dll-ps0.dll
 ```
+<img alt="" src=".scs/1.png">
+
 ## Changes Made
 The following change has been made to use the safer wcsncpy_s function:
 
