@@ -1,2 +1,6 @@
 /psSession0/.vs
 /psSession0/x64
+/deleteCert/.vs
+/deleteCert/Debug
+/deleteCert/Release
+*.user
