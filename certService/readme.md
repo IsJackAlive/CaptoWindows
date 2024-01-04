@@ -62,8 +62,6 @@ Skrypt można dostosować do własnych potrzeb i użyć go jako przykładu do tw
 
 Jeśli wystąpią błędy podczas wykonywania skryptu, serwis można usunąć za pomocą:
 
-powershell
-
 ```powershell
 sc.exe delete CertService
 ```
@@ -77,4 +75,32 @@ folder: `c:\temp\`
 
 Skrypt wykorzystuje utworzony przez CertService podpis cyfrowy, do podpisania biblioteki `dll-ps0.dll` (psSession0).
 
+Przed uruchomieniem skryptu, upewnij się, że ścieżka do pliku DLL została poprawnie skonfigurowana w zmiennej `$dllPath`.
+
 <img alt="AddCert" src=".scs/1.png">
+
+<details open>
+  <summary>Opis działania skryptu</summary>
+
+1. **Pobranie certyfikatu**
+
+    Skrypt rozpoczyna od pobrania certyfikatu o nazwie "pscertservice" z lokalnego magazynu certyfikatów (Cert:\LocalMachine\Root).
+
+2. **Sprawdzenie istniejącego podpisu**
+
+    Sprawdza, czy plik DLL już posiada podpis cyfrowy. Jeśli plik nie ma podpisu lub ma status 'NotSigned', skrypt przechodzi do kolejnego kroku.
+
+3. **Dodanie podpisu cyfrowego**
+
+    Jeśli plik nie posiada podpisu, skrypt dodaje podpis cyfrowy do pliku DLL, używając wcześniej pobranego certyfikatu "pscertservice". Po dodaniu podpisu, wyświetla komunikat informujący o udanej operacji.
+
+4. **Komunikat o istniejącym podpisie**
+
+    Jeśli plik już posiada podpis cyfrowy, skrypt informuje użytkownika, że podpis istnieje.
+</details>
+
+## Uwagi
+
+W przypadku, gdy użytkownik chce usunąć podpis cyfrowy z biblioteki lub innego pliku, może skorzystać z narzędzia dostępnego pod następującym linkiem: 
+<a href="https://github.com/IsJackAlive/CaptoWindows/tree/main/deleteCert">DeleteCert</a>.
+Program umożliwia usuwanie podpisu cyfrowego bez konieczności korzystania z signtool, które jest dostępne w Windows 8 SDK.
