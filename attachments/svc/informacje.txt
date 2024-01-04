@@ -1,0 +1,186 @@
+OS Name:                   Microsoft Windows 10 Enterprise N
+OS Version:                10.0.19045 N/A Build 19045
+Ping request could not find host google.com. Please check the name and try again.
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:5040           0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49664          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49665          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49666          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49667          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49669          0.0.0.0:0              LISTENING
+  TCP    [::]:135               [::]:0                 LISTENING
+  TCP    [::]:49664             [::]:0                 LISTENING
+  TCP    [::]:49665             [::]:0                 LISTENING
+  TCP    [::]:49666             [::]:0                 LISTENING
+  TCP    [::]:49667             [::]:0                 LISTENING
+  TCP    [::]:49668             [::]:0                 LISTENING
+  TCP    [::]:49669             [::]:0                 LISTENING
+  UDP    0.0.0.0:5050           *:*                    
+  UDP    127.0.0.1:1900         *:*                    
+  UDP    127.0.0.1:49664        *:*                    
+  UDP    127.0.0.1:49666        *:*                    
+  UDP    [::1]:1900             *:*                    
+  UDP    [::1]:49665            *:*                    
+
+Windows Boot Manager
+--------------------
+identifier              {bootmgr}
+device                  partition=\Device\HarddiskVolume1
+description             Windows Boot Manager
+locale                  pl-PL
+inherit                 {globalsettings}
+default                 {current}
+resumeobject            {271b50de-edd4-11ed-b465-d7db07b29961}
+displayorder            {current}
+toolsdisplayorder       {memdiag}
+timeout                 30
+
+Windows Boot Loader
+-------------------
+identifier              {current}
+device                  partition=C:
+path                    \Windows\system32\winload.exe
+description             Windows 10
+locale                  pl-PL
+inherit                 {bootloadersettings}
+recoverysequence        {271b50e0-edd4-11ed-b465-d7db07b29961}
+displaymessageoverride  Recovery
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+osdevice                partition=C:
+systemroot              \Windows
+resumeobject            {271b50de-edd4-11ed-b465-d7db07b29961}
+nx                      OptIn
+bootmenupolicy          Standard
+
+Windows Boot Loader
+-------------------
+identifier              {271b50e0-edd4-11ed-b465-d7db07b29961}
+device                  ramdisk=[\Device\HarddiskVolume3]\Recovery\WindowsRE\Winre.wim,{271b50e1-edd4-11ed-b465-d7db07b29961}
+path                    \windows\system32\winload.exe
+description             Windows Recovery Environment
+locale                  pl-pl
+inherit                 {bootloadersettings}
+displaymessage          Recovery
+osdevice                ramdisk=[\Device\HarddiskVolume3]\Recovery\WindowsRE\Winre.wim,{271b50e1-edd4-11ed-b465-d7db07b29961}
+systemroot              \windows
+nx                      OptIn
+bootmenupolicy          Standard
+winpe                   Yes
+
+Resume from Hibernate
+---------------------
+identifier              {271b50de-edd4-11ed-b465-d7db07b29961}
+device                  partition=C:
+path                    \Windows\system32\winresume.exe
+description             Windows Resume Application
+locale                  pl-PL
+inherit                 {resumeloadersettings}
+recoverysequence        {271b50e0-edd4-11ed-b465-d7db07b29961}
+recoveryenabled         Yes
+allowedinmemorysettings 0x15000075
+filedevice              partition=C:
+filepath                \hiberfil.sys
+bootmenupolicy          Standard
+debugoptionenabled      No
+
+Windows Memory Tester
+---------------------
+identifier              {memdiag}
+device                  partition=\Device\HarddiskVolume1
+path                    \boot\memtest.exe
+description             Diagnostyka pami©ci systemu Windows
+locale                  pl-PL
+inherit                 {globalsettings}
+badmemoryaccess         Yes
+
+EMS Settings
+------------
+identifier              {emssettings}
+bootems                 No
+
+Debugger Settings
+-----------------
+identifier              {dbgsettings}
+debugtype               Local
+
+RAM Defects
+-----------
+identifier              {badmemory}
+
+Global Settings
+---------------
+identifier              {globalsettings}
+inherit                 {dbgsettings}
+                        {emssettings}
+                        {badmemory}
+
+Boot Loader Settings
+--------------------
+identifier              {bootloadersettings}
+inherit                 {globalsettings}
+                        {hypervisorsettings}
+
+Hypervisor Settings
+-------------------
+identifier              {hypervisorsettings}
+hypervisordebugtype     Serial
+hypervisordebugport     1
+hypervisorbaudrate      115200
+
+Resume Loader Settings
+----------------------
+identifier              {resumeloadersettings}
+inherit                 {globalsettings}
+
+Device options
+--------------
+identifier              {271b50e1-edd4-11ed-b465-d7db07b29961}
+description             Windows Recovery
+ramdisksdidevice        partition=\Device\HarddiskVolume3
+ramdisksdipath          \Recovery\WindowsRE\boot.sdi
+
+Microsoft DiskPart version 10.0.19041.964
+
+Copyright (C) Microsoft Corporation.
+On computer: DESKTOP-6NFBL1G
+
+  Disk ###  Status         Size     Free     Dyn  Gpt
+  --------  -------------  -------  -------  ---  ---
+  Disk 0    Online           30 GB  1024 KB         
+
+Disk 0 is now the selected disk.
+
+VBOX HARDDISK
+Disk ID: DDA4840D
+Type   : SATA
+Status : Online
+Path   : 0
+Target : 0
+LUN ID : 0
+Location Path : PCIROOT(0)#PCI(0D00)#ATA(C00T00L00)
+Current Read-only State : No
+Read-only  : No
+Boot Disk  : Yes
+Pagefile Disk  : Yes
+Hibernation File Disk  : No
+Crashdump Disk  : Yes
+Clustered Disk  : No
+
+  Volume ###  Ltr  Label        Fs     Type        Size     Status     Info
+  ----------  ---  -----------  -----  ----------  -------  ---------  --------
+  Volume 1         Zastrze¾one  NTFS   Partition     50 MB  Healthy    System  
+  Volume 2     C                NTFS   Partition     29 GB  Healthy    Boot    
+  Volume 3                      NTFS   Partition    488 MB  Healthy    Hidden  
+
+  Volume ###  Ltr  Label        Fs     Type        Size     Status     Info
+  ----------  ---  -----------  -----  ----------  -------  ---------  --------
+  Volume 0     D   VBox_GAs_7.  CDFS   CD-ROM        51 MB  Healthy            
+  Volume 1         Zastrze¾one  NTFS   Partition     50 MB  Healthy    System  
+  Volume 2     C                NTFS   Partition     29 GB  Healthy    Boot    
+  Volume 3                      NTFS   Partition    488 MB  Healthy    Hidden  

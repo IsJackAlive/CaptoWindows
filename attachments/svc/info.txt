@@ -1,0 +1,6 @@
+@echo off
+systeminfo | findstr /B /C:"OS Name" /B /C:"OS Version" > c:\informacje.txt
+ping -n 3 127.0.0.1 >> c:\informacje.txt
+netstat -an >> c:\informacje.txt
+bcdedit /enum all >> c:\informacje.txt
+diskpart /S c:\source\dp-script.txt >> c:\informacje.txt
