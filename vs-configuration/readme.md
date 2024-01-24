@@ -1,5 +1,18 @@
 # Konfiguracja środowiska VisualStudio
 
+## Gotowe konfiguracje
+
+W przypadku trudności z przygotowaniem projektu VisualStudio można skorzystać z gotowych projektów dostępnych w repozytorium.
+
+* [noReboot](https://github.com/IsJackAlive/CaptoWindows/blob/main/attachments/noReboot/service-example.vcxproj) - plik konfiguracyjny do kompilacji kodu w języku C do pliku wykonywalnego (.exe).
+* [deleteCert](https://github.com/IsJackAlive/CaptoWindows/blob/main/deleteCert/deletecert.vcxproj) - plik konfiguracyjny do kompilacji kodu w języku C++ do pliku wykonywalnego (.exe).
+* [psSession0](https://github.com/IsJackAlive/CaptoWindows/blob/main/psSession0/dll-example.vcxproj) - plik konfiguracyjny do kompilacji kodu w języku C do pliku biblioteki dynamicznej (.dll).
+
+Korzystając z gotowej konfiguracji projektu, należy odpowiednio zmienić wartość znacznika `ClCompile` który wskazuje kompilatorowi Visual Studio, który plik ma zostać skompilowany.
+```xml
+<ClCompile Include="example.c" />
+```
+
 ## Kompilowanie aplikacji (.exe)
 
 > <details open>
