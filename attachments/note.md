@@ -1,8 +1,4 @@
-# notatka z Windows Internals 7ed. 
-
-## Part 1
-
-## Part 2
+# notatka z Windows Internals 7ed. Part 2
 
 ### Service characteristics //786
 

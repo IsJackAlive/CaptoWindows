@@ -4,7 +4,7 @@
 
 ## Wprowadzenie
 
-Z uwagi na to, że konfiguracja Visual Studio sprawiała mi wiele problemów, uniemożliwiając prawidłową kompilację biblioteki DLL, udostępniam pliki, które umożliwią otwarcie działającego projektu do kompilacji DLL w języku C dla systemu Windows.
+Z uwagi na problemy z konfiguracją Visual Studio, udostępniam gotowy do użycia projekt dla kompilacji DLL w języku C dla Windows.
 
 ## Opis
 

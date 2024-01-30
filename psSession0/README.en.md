@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Due to numerous issues with Visual Studio configuration, hindering the correct compilation of the DLL library, I am providing files that will allow opening a functional project for DLL compilation in C language for the Windows system.
+Due to configuration issues with Visual Studio, I provide a ready-to-use project for compiling a C language DLL on Windows.
 
 ## Description
 
