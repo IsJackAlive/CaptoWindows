@@ -1,13 +1,14 @@
-# Wpisz '.\LoopShutdown.ps1 -d' aby wyłączyć i usunąć usługi.
+# Wpisz '.\clearCapto.ps1 -d' aby wyłączyć i usunąć wymienione usługi.
 param (
     [switch]$d
 )
 
-for ($i = 4; $i -ge 1; $i--) {
-    $serviceName = "Loop${i}Service"    
+$services = @("CantStop", "CertService", "RunService", "CaptoPs", "norebootsvc")
+
+foreach ($serviceName in $services) {
     if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
         Stop-Service -Name $serviceName -Force
-        Write-Host "Usluga $serviceName zostala wylaczona."
+        Write-Host "Usluga $serviceName została wylaczona."
         if ($d) {
             sc.exe delete $serviceName
             Write-Host "Usluga $serviceName zostala usunieta."
