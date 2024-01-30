@@ -1,0 +1,7 @@
+Date: 01-30 19:46:46 Name: RunService Path: C:\Users\capto\AppData\Local\Temp\RunService.exe
+Date: 01-30 19:47:29 Name: cantStop Path: C:\Users\capto\AppData\Local\Temp\cantStop.exe
+Date: 01-30 19:48:03 Name: Loop1Service Path: C:\Users\capto\AppData\Local\Temp\Loop1Service.exe
+Date: 01-30 19:48:17 Name: Loop2Service Path: C:\Users\capto\AppData\Local\Temp\Loop2Service.exe
+Date: 01-30 19:48:24 Name: Loop3Service Path: C:\Users\capto\AppData\Local\Temp\Loop3Service.exe
+Date: 01-30 19:49:06 Name: Loop4Service Path: C:\Users\capto\AppData\Local\Temp\Loop4Service.exe
+Date: 01-30 19:50:16 Name: CertService Path: C:\Users\capto\AppData\Local\Temp\CertService.exe

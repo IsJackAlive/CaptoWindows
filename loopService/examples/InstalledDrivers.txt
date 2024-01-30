@@ -1,0 +1,60 @@
+
+Local Print Queue              printqueue.in TRUE     Microsoft                
+Local Print Queue              printqueue.in TRUE     Microsoft                
+Local Print Queue              printqueue.in TRUE     Microsoft                
+Local Print Queue              printqueue.in TRUE     Microsoft                
+WAN Miniport (Network Monitor) netrasa.inf   TRUE     Microsoft                
+WAN Miniport (IPv6)            netrasa.inf   TRUE     Microsoft                
+WAN Miniport (IP)              netrasa.inf   TRUE     Microsoft                
+WAN Miniport (PPPOE)           netrasa.inf   TRUE     Microsoft                
+WAN Miniport (PPTP)            netrasa.inf   TRUE     Microsoft                
+WAN Miniport (L2TP)            netrasa.inf   TRUE     Microsoft                
+WAN Miniport (IKEv2)           netavpna.inf  TRUE     Microsoft                
+WAN Miniport (SSTP)            netsstpa.inf  TRUE     Microsoft                
+Generic software device        c_swdevice.in TRUE     Microsoft                
+Generic software device        c_swdevice.in TRUE     Microsoft                
+Generic software device        c_swdevice.in TRUE     Microsoft                
+Generic software device        c_swdevice.in TRUE     Microsoft                
+Remote Desktop Device Redirect rdpbus.inf    TRUE     Microsoft                
+Plug and Play Software Device  swenum.inf    TRUE     (Standard system devices)
+Microsoft System Management BI mssmbios.inf  TRUE     (Standard system devices)
+NDIS Virtual Network Adapter E ndisvirtualbu TRUE     Microsoft                
+Microsoft Basic Render Driver  basicrender.i TRUE     Microsoft                
+ACPI Fixed Feature Button      machine.inf   TRUE     (Standardowe urz卡zenia s
+Intel Processor                cpu.inf       TRUE     Intel                    
+Intel Processor                cpu.inf       TRUE     Intel                    
+Microsoft AC Adapter           cmbatt.inf    TRUE     Microsoft                
+Microsoft ACPI-Compliant Contr cmbatt.inf    TRUE     Microsoft                
+CD-ROM Drive                   cdrom.inf     TRUE     (Standard CD-ROM drives) 
+Disk drive                     disk.inf      TRUE     (Standard disk drives)   
+Standard SATA AHCI Controller  mshdc.inf     TRUE     Standard SATA AHCI Contro
+HID-compliant mouse            msmouse.inf   TRUE     Microsoft                
+USB Input Device               input.inf     TRUE     (Standard system devices)
+USB Root Hub                   usbport.inf   TRUE     (Standard USB Host Contro
+Standard OpenHCD USB Host Cont usbport.inf   TRUE     (Standard USB Host Contro
+VirtualBox Guest Device        oem4.inf      TRUE     Oracle Corporation       
+Intel(R) PRO/1000 MT Desktop A nete1g3e.inf  TRUE     Intel                    
+Generic Non-PnP Monitor        monitor.inf   TRUE     (Standard monitor types) 
+VirtualBox Graphics Adapter (W oem5.inf      TRUE     Oracle Corporation       
+Programmable interrupt control machine.inf   TRUE     (Standardowe urz卡zenia s
+System timer                   machine.inf   TRUE     (Standardowe urz卡zenia s
+Microsoft PS/2 Mouse           msmouse.inf   TRUE     Microsoft                
+Direct memory access controlle machine.inf   TRUE     (Standardowe urz卡zenia s
+Standard PS/2 Keyboard         keyboard.inf  TRUE     (Standard keyboards)     
+PCI to ISA Bridge              machine.inf   TRUE     Intel                    
+CPU to PCI Bridge              machine.inf   TRUE     Intel                    
+PCI Bus                        pci.inf       TRUE     (Standard system devices)
+Microsoft ACPI-Compliant Syste acpi.inf      TRUE     Microsoft                
+ACPI x64-based PC              hal.inf       TRUE     (Standard computers)     
+Charge Arbitration Driver      ChargeArbitra TRUE     (Standard system devices)
+UMBus Root Bus Enumerator      umbus.inf     TRUE     Microsoft                
+Microsoft Kernel Debug Network kdnic.inf     TRUE     Microsoft                
+Microsoft Storage Spaces Contr spaceport.inf TRUE     Microsoft                
+Microsoft Virtual Drive Enumer vdrvroot.inf  TRUE     Microsoft                
+Composite Bus Enumerator       compositebus. TRUE     Microsoft                
+Microsoft Hyper-V Virtualizati wvid.inf      TRUE     Microsoft                
+Microsoft Basic Display Driver basicdisplay. TRUE     (Standard display types) 
+Volume                         volume.inf    TRUE     Microsoft                
+Volume                         volume.inf    TRUE     Microsoft                
+Volume                         volume.inf    TRUE     Microsoft                
+Volume Manager                 volmgr.inf    TRUE     Microsoft                

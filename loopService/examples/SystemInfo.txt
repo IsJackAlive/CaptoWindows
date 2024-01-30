@@ -1,0 +1,30 @@
+Konta uzytkownikow:
+Administrator
+capto
+Gość
+Konto domyślne
+WDAGUtilityAccount
+
+Grupy:
+Administratorzy
+Administratorzy funkcji Hyper-V
+Czytelnicy dzienników zdarzeń
+Goście
+Grupa kont zarządzana przez system
+IIS_IUSRS
+Operatorzy konfiguracji sieci
+Operatorzy kopii zapasowych
+Operatorzy kryptograficzni
+Operatorzy pomocy kontroli dostępu
+Replikator
+Użytkownicy
+Użytkownicy DCOM
+Użytkownicy dzienników wydajności
+Użytkownicy monitora wydajności
+Użytkownicy pulpitu zdalnego
+Użytkownicy zaawansowani
+Użytkownicy zarządzania zdalnego
+Właściciele urządzenia
+
+Informacje o systemie:
+Caption: Microsoft Windows 10 Enterprise N, Version: 10.0.19045, Total Memory: 4095540 KB
