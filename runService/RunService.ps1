@@ -1,8 +1,8 @@
 # RunService2 25-05
+# Add-Type w PowerShell korzysta z kompilatora C# 5.0
 
 $serviceName = "RunService"
 $serviceDisplayName = "Run Service"
-$serviceDescription = "This is a sample service created using C#."
 
 # Definiowanie kodu C#
 $serviceCode = @"
@@ -16,32 +16,40 @@ namespace RunService
     public class MyService : ServiceBase
     {
         private Timer timer;
-
+        private const string ServiceLogMessage = "Run Service Run!";
         public MyService()
         {
             ServiceName = "$serviceName";
             CanStop = true;
             CanPauseAndContinue = false;
             AutoLog = true;
+            timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
         }
-
         protected override void OnStart(string[] args)
         {
             // Kod wykonywany po rozpoczęciu pracy serwisu
-            timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
+            timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(30));
         }
-
         protected override void OnStop()
         {
             // Kod wykonywany po zatrzymaniu pracy serwisu
-            timer.Dispose();
+            if (timer != null)
+            {
+                timer.Dispose();
+                timer = null;
+            }
         }
-
         private void DoWork(object state)
         {
-            EventLog.WriteEntry("$serviceName", "Run Service Run!", EventLogEntryType.Information);
+            try
+            {
+                EventLog.WriteEntry(ServiceName, ServiceLogMessage, EventLogEntryType.Information);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(ServiceName, String.Format("Błąd podczas zapisywania do dziennika zdarzeń: {0}", ex.Message), EventLogEntryType.Error);
+            }
         }
-        
         public static void Main()
         {
             ServiceBase.Run(new MyService());
@@ -51,26 +59,29 @@ namespace RunService
 "@
 
 # Zapisywanie kodu C# do pliku
-$serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "RunService.cs"
+$serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.cs"
 $serviceCode | Out-File -FilePath $serviceCodePath -Encoding UTF8
 
 # Kompilowanie kodu C# do pliku wykonywalnego .exe
-$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "RunService.exe"
+$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll"
+    ReferencedAssemblies = "System.dll", "System.ServiceProcess.dll"
 }
-Add-Type @compilerParams
+Add-Type @compilerParams # Operator splatting (@) pozwala na przekazanie tablicy lub słownika argumentów do cmdletu.
 
 # Dodawanie serwisu RunService do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+# Dodaj korzystajac z sc.exe
+# Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+# Lub dodaj korzystajac z PowerShell cmdlet
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
-# Ustawianie opisu serwisu
-$service = Get-WmiObject -Class Win32_Service -Filter "Name='$serviceName'"
-$service.Description = $serviceDescription
-$service.Put()
+# Zapisz informacje o utworzonym serwisie na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
 
-# Sprawdzanie stanu serwisu
-Get-Service -Name $serviceName
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"

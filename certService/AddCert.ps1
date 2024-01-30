@@ -10,10 +10,10 @@ try {
         Set-AuthenticodeSignature -FilePath $dllPath -Certificate $psCert
         Write-Host "Dodano podpis cyfrowy do: $dllPath"
     } else {
-        Write-Host "Plik $dllPath już ma podpis cyfrowy."
+        Write-Host "Plik $dllPath juz ma podpis cyfrowy."
     }
 } catch {
-    Write-Host "Błąd podczas manipulacji podpisem cyfrowym pliku: $dllPath"
+    Write-Host "Blad podczas manipulacji podpisem cyfrowym pliku: $dllPath"
 }
 
 # Sprawdzenie certyfikatu

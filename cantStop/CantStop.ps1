@@ -1,12 +1,10 @@
 $serviceName = "cantStop"
 $serviceDisplayName = "Can't Stop Service"
-$serviceDescription = "This is a sample service created using PowerShell."
 
 # Definiowanie kodu C#
 $serviceCode = @"
 using System;
 using System.ServiceProcess;
-using System.Threading;
 
 namespace cantStop
 {
@@ -33,26 +31,33 @@ namespace cantStop
 "@
 
 # Zapisywanie kodu C# do pliku
-$serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "cantStop.cs"
+$serviceCodePath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.cs"
 $serviceCode | Out-File -FilePath $serviceCodePath -Encoding UTF8
 
 # Kompilowanie kodu C# do pliku wykonywalnego .exe
-$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "cantStop.exe"
+$assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll"
+    ReferencedAssemblies = "System.dll", "System.ServiceProcess.dll"
 }
-Add-Type @compilerParams
+# Add-Type @compilerParams
+
+try {
+    Add-Type @compilerParams
+} catch {
+    Write-Error "Compilation failed: $_"
+    exit 1
+}
 
 # Dodawanie serwisu cantStop do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
-# Ustawianie opisu serwisu
-$service = Get-WmiObject -Class Win32_Service -Filter "Name='$serviceName'"
-$service.Description = $serviceDescription
-$service.Put()
+# Zapisz informacje o utworzonym serwisie na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
 
-# Sprawdzanie stanu serwisu
-Get-Service -Name $serviceName
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"

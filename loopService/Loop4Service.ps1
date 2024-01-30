@@ -8,7 +8,6 @@ $serviceDisplayName = "Loop4 Service"
 $serviceCode = @"
 using System;
 using System.ServiceProcess;
-using System.Threading;
 
 namespace powerShellService
 {
@@ -19,22 +18,6 @@ namespace powerShellService
             ServiceName = "$serviceName";
             CanStop = true;
             CanPauseAndContinue = true;
-        }
-        protected override void OnStart(string[] args)
-        {   
-            base.OnStart(args);
-        }
-        protected override void OnStop()
-        {   
-            base.OnStop();
-        }
-        protected override void OnPause()
-        {
-            base.OnPause();
-        }
-        protected override void OnContinue()
-        {
-            base.OnContinue();
         }
         public static void Main()
         {
@@ -55,7 +38,7 @@ $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll"
+    ReferencedAssemblies = "System.dll", "System.ServiceProcess.dll"
 }
 
 # Kompilacja kodu do pliku wykonywalnego (.exe)
@@ -63,7 +46,7 @@ Add-Type @compilerParams
 
 # Dodawanie serwisu do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
 # Sprawdzanie stanu serwisu
 Get-Service -Name $serviceName | Select-Object Name, Status
@@ -71,4 +54,10 @@ Get-Service -Name $serviceName | Select-Object Name, Status
 # Dodanie zależności Loop4Service od Loop3Service
 Start-Process -FilePath "sc.exe" -ArgumentList "config $serviceName depend= Loop3Service" -NoNewWindow -Wait
 
-Write-Host "Aby uruchomić wpisz: sc.exe start $serviceName `nJeśli wystąpiły błędy usuń za pomocą: sc.exe delete $serviceName"
+# Zapisz informacje o utworzonym serwisie na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
+
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"

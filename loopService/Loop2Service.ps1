@@ -1,4 +1,4 @@
-# Informacje o kontach użytkowników, grupach, uprawnieniach oraz datę ostatniej aktualizacji systemu w pliku C:\SystemInfo.txt
+# Zapisuje informacje o kontach użytkowników, grupach oraz datę ostatniej aktualizacji systemu w pliku C:\SystemInfo.txt
 
 # Tworzenie usługi
 $serviceName = "Loop2Service"
@@ -8,51 +8,41 @@ $serviceDisplayName = "Loop2 Service"
 $serviceCode = @"
 using System;
 using System.IO;
-using System.Diagnostics;
+using System.Management;
 using System.ServiceProcess;
-using System.Security.Principal;
+using System.DirectoryServices.AccountManagement;
+using System.Collections.Generic;
 
 namespace powerShellService
 {
     public class pShellService : ServiceBase
     {
-
         public pShellService()
         {
             ServiceName = "$serviceName";
             CanHandleSessionChangeEvent = true;
-            this.CanPauseAndContinue = true;
-            this.CanShutdown = true;
-            this.CanStop = true;
+            CanPauseAndContinue = true;
+            CanShutdown = true;
+            CanStop = true;
         }
-
         static void Main()
         {
             ServiceBase.Run(new pShellService());
         }
-
         protected override void OnStart(string[] args)
         {
             base.OnStart(args);
             CollectSystemInfo();
         }
-
-        protected override void OnStop()
-        {
-            base.OnStop();
-        }
-
         private void CollectSystemInfo()
         {
-            try
-            {
-                // Ścieżka do pliku, w którym będziemy zapisywać informacje
-                string outputPath = "C:\\SystemInfo.txt";
+            // Ścieżka do pliku wyjściowego
+            string outputPath = "C:\\SystemInfo.txt";
 
-                using (StreamWriter writer = new StreamWriter(outputPath))
+            using (StreamWriter writer = new StreamWriter(outputPath))
                 {
                     // Informacje o kontach użytkowników
-                    writer.WriteLine("Konta użytkowników:");
+                    writer.WriteLine("Konta uzytkownikow:");
                     foreach (var user in GetLocalUsers())
                     {
                         writer.WriteLine(user);
@@ -65,59 +55,75 @@ namespace powerShellService
                         writer.WriteLine(group);
                     }
 
-                    // Informacje o uprawnieniach (lokalne grupy i ich uprawnienia)
-                    writer.WriteLine("\nUprawnienia grup:");
-                    foreach (var group in GetLocalGroupPermissions())
-                    {
-                        writer.WriteLine(group);
-                    }
-
-                    // Data ostatniej aktualizacji systemu
-                    writer.WriteLine("\nData ostatniej aktualizacji systemu:");
-                    string lastUpdate = GetLastSystemUpdate();
-                    writer.WriteLine(lastUpdate);
+                    // Informacje o systemie
+                    writer.WriteLine("\nInformacje o systemie:");
+                    string info = GetSystemInfo();
+                    writer.WriteLine(info);
                 }
-
-                // Poinformuj, że informacje zostały zapisane
-                EventLog.WriteEntry("SystemInfoService", "Informacje zostały zapisane w pliku C:\\SystemInfo.txt", EventLogEntryType.Information);
-            }
-            catch (Exception ex)
-            {
-                // Obsługa ewentualnych błędów
-                EventLog.WriteEntry("SystemInfoService", "Błąd podczas zbierania informacji: " + ex.Message, EventLogEntryType.Error);
-            }
         }
 
         private string[] GetLocalUsers()
         {
-            // Tutaj zbierz informacje o kontach użytkowników
-            // Przykład: zastosowanie System.DirectoryServices.AccountManagement
+            List<string> users = new List<string>();
+            using (PrincipalContext context = new PrincipalContext(ContextType.Machine))
+            {
+                using (UserPrincipal userPrincipal = new UserPrincipal(context))
+                {
+                    using (PrincipalSearcher searcher = new PrincipalSearcher(userPrincipal))
+                    {
+                        foreach (var result in searcher.FindAll())
+                        {
+                            UserPrincipal user = result as UserPrincipal;
 
-            return new string[] { "User1", "User2", "User3" };
+                            if (user != null)
+                            {
+                                users.Add(user.Name);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return users.ToArray();
         }
 
         private string[] GetLocalGroups()
         {
-            // Tutaj zbierz informacje o grupach
-            // Przykład: zastosowanie System.DirectoryServices.AccountManagement
-
-            return new string[] { "Group1", "Group2", "Group3" };
+            List<string> groups = new List<string>();
+            using (PrincipalContext context = new PrincipalContext(ContextType.Machine))
+            {
+                using (GroupPrincipal groupPrincipal = new GroupPrincipal(context))
+                {
+                    using (PrincipalSearcher searcher = new PrincipalSearcher(groupPrincipal))
+                    {
+                        foreach (var result in searcher.FindAll())
+                        {
+                            GroupPrincipal group = result as GroupPrincipal;
+                            if (group != null)
+                            {
+                                groups.Add(group.Name);
+                            }
+                        }
+                    }
+                }
+            }
+            return groups.ToArray();
         }
 
-        private string[] GetLocalGroupPermissions()
-        {
-            // Tutaj zbierz informacje o uprawnieniach grup
-            // Przykład: zastosowanie System.DirectoryServices.AccountManagement
-
-            return new string[] { "Permission1", "Permission2", "Permission3" };
-        }
-
-        private string GetLastSystemUpdate()
-        {
-            // Tutaj uzyskaj datę ostatniej aktualizacji systemu
-            // Przykład: zastosowanie dostępu do informacji o aktualizacjach systemowych
-
-            return DateTime.Now.ToString();
+        private string GetSystemInfo()
+        {   
+            // https://learn.microsoft.com/pl-pl/dotnet/api/system.management.managementobjectsearcher.-ctor?view=dotnet-plat-ext-8.0#system-management-managementobjectsearcher-ctor(system-string)
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
+            foreach (ManagementObject os in searcher.Get())
+            {
+                string caption = os["Caption"].ToString();
+                string version = os["Version"].ToString();
+                ulong totalMemory = Convert.ToUInt64(os["TotalVisibleMemorySize"]);
+                
+                string systemInfo = string.Format("Caption: {0}, Version: {1}, Total Memory: {2} KB", caption, version, totalMemory);
+                return systemInfo;
+            }
+            return "No WMI info found";
         }
     }
 }
@@ -134,7 +140,7 @@ $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll", "System.dll", "System.Configuration.Install.dll"
+    ReferencedAssemblies = "System.dll",  "System.ServiceProcess.dll", "System.DirectoryServices.dll", "System.DirectoryServices.AccountManagement.dll", "System.Management.dll"
 }
 
 # Kompilacja kodu do pliku wykonywalnego (.exe)
@@ -142,12 +148,15 @@ Add-Type @compilerParams
 
 # Dodawanie serwisu do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
-
-# Sprawdzanie stanu serwisu
-Get-Service -Name $serviceName | Select-Object Name, Status
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
 # Dodanie zależności Loop2Service od Loop1Service
 Start-Process -FilePath "sc.exe" -ArgumentList "config $serviceName depend= Loop1Service" -NoNewWindow -Wait
 
-Write-Host "Aby uruchomić wpisz: sc.exe start $serviceName `nJeśli wystąpiły błędy usuń za pomocą: sc.exe delete $serviceName"
+# Zapisz informacje o utworzonym serwisie na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
+
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"

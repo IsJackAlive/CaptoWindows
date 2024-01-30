@@ -31,9 +31,9 @@ namespace powerShellService
         {
             ServiceName = "$serviceName";
             CanHandleSessionChangeEvent = true;
-            this.CanPauseAndContinue = true;
-            this.CanShutdown = true;
-            this.CanStop = true;
+            CanPauseAndContinue = true;
+            CanShutdown = true;
+            CanStop = true;
         }
 
         static void Main()
@@ -47,21 +47,13 @@ namespace powerShellService
             driverScan();
         }
 
-        protected override void OnStop()
-        {
-            base.OnStop();
-        }
-
         private void driverScan()
         {
-            try
-            {
-                // Komenda wiersza poleceń do pobrania listy sterowników
-                string command = "driverquery /nh /si > C:\\InstalledDrivers.txt";
+            const string command = "driverquery /nh /si > C:\\InstalledDrivers.txt";
 
-                // Utworzenie procesu do wykonania komendy wiersza poleceń
-                Process process = new Process();
-                ProcessStartInfo startInfo = new ProcessStartInfo
+            using (var process = new Process())
+            {
+                var startInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
                     RedirectStandardInput = true,
@@ -71,7 +63,6 @@ namespace powerShellService
                 process.StartInfo = startInfo;
                 process.Start();
 
-                // Przekazanie komendy wiersza poleceń do procesu
                 using (StreamWriter sw = process.StandardInput)
                 {
                     if (sw.BaseStream.CanWrite)
@@ -79,16 +70,7 @@ namespace powerShellService
                         sw.WriteLine(command);
                     }
                 }
-
-                // Oczekiwanie na zakończenie procesu
                 process.WaitForExit();
-                process.Close();
-
-                Console.WriteLine("Lista sterowników została zapisana w pliku C:\\InstalledDrivers.txt.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Wystąpił błąd: " + ex.Message);
             }
         }
     }
@@ -106,7 +88,7 @@ $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll", "System.dll", "System.Configuration.Install.dll"
+    ReferencedAssemblies = "System.dll",  "System.ServiceProcess.dll"
 }
 
 # Kompilacja kodu do pliku wykonywalnego (.exe)
@@ -114,12 +96,15 @@ Add-Type @compilerParams
 
 # Dodawanie serwisu do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
-
-# Sprawdzanie stanu serwisu
-Get-Service -Name $serviceName | Select-Object Name, Status
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
 # Dodanie zależności Loop1Service od CertService (Opcjonalnie)
 # Start-Process -FilePath "sc.exe" -ArgumentList "config $serviceName depend= CertService" -NoNewWindow -Wait
 
-Write-Host "Aby uruchomić wpisz: sc.exe start $serviceName `nJeśli wystąpiły błędy usuń za pomocą: sc.exe delete $serviceName"
+# Zapisz informacje o utworzonym serwisie na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
+
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"

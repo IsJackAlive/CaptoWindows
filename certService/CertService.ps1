@@ -8,13 +8,14 @@ $serviceCode = @"
 using System;
 using System.Diagnostics;
 using System.ServiceProcess;
-using System.Timers;
+using System.Threading;
+using System.Linq;
 
 namespace powerShellService
 {
     public class pShellService : ServiceBase
     {
-        private System.Timers.Timer serviceTimer;
+        private Timer serviceTimer;
 
         public pShellService()
         {
@@ -23,35 +24,28 @@ namespace powerShellService
             CanPauseAndContinue = false;
             AutoLog = true;
         }
-
         protected override void OnStart(string[] args)
         {
             // Inicjalizacja timera
-            serviceTimer = new System.Timers.Timer(10000);
-            serviceTimer.Elapsed += CheckForCalculator;
-            serviceTimer.AutoReset = true;
-            serviceTimer.Enabled = true;
+            serviceTimer = new Timer(CheckForCalculator, null, 0, 10000);
         }
-
-        private void CheckForCalculator(object sender, ElapsedEventArgs e)
+        private void CheckForCalculator(object state)
         {
             // Sprawdź, czy proces Kalkulatora jest uruchomiony
-            Process[] processes = Process.GetProcessesByName("CalculatorApp");
+            var processes = Process.GetProcessesByName("CalculatorApp");
 
-            if (processes.Length > 0)
+            if (processes.Any())
             {
                 // Proces Kalkulatora został znaleziony
                 EventLog.WriteEntry(ServiceName, "Uruchomiono kalkulator", EventLogEntryType.Information);
             }
         }
-
         protected override void OnStop()
         {
             // Zatrzymaj timer
-            serviceTimer.Stop();
+            serviceTimer.Change(Timeout.Infinite, Timeout.Infinite);
             serviceTimer.Dispose();
         }
-
         public static void Main()
         {
             ServiceBase.Run(new pShellService());
@@ -72,7 +66,7 @@ $assemblyPath = Join-Path -Path $env:TEMP -ChildPath "$serviceName.exe"
 $compilerParams = @{
     TypeDefinition = Get-Content -Path $serviceCodePath -Raw
     OutputAssembly = $assemblyPath
-    ReferencedAssemblies = "System.ServiceProcess.dll", "System.dll", "System.Configuration.Install.dll"
+    ReferencedAssemblies = "System.dll",  "System.ServiceProcess.dll"
 }
 
 # Kompilacja kodu do pliku wykonywalnego (.exe)
@@ -101,16 +95,16 @@ function SignCode {
 
             if ($authenticodeSignature.Status -eq 'NotSigned') {
                 Set-AuthenticodeSignature -Certificate $cert -FilePath $FilePath -ErrorAction Stop
-                Write-Host "Plik podpisany pomyślnie."
+                Write-Host "Plik podpisany pomyslnie."
             } else {
-                Write-Host "Plik jest już podpisany."
+                Write-Host "Plik jest juz podpisany."
             }
         } else {
-            Write-Host "Błąd: Nie można znaleźć certyfikatu o podanym thumbprint."
+            Write-Host "Blad: Nie mozna znalezc certyfikatu o podanym thumbprint."
         }
     }
     catch {
-        Write-Host "Błąd podpisywania pliku: $_"
+        Write-Host "Blad podpisywania pliku: $_"
     }
 }
 
@@ -121,17 +115,23 @@ SignCode $assemblyPath
 $cert = Get-AuthenticodeSignature -FilePath $assemblyPath
 
 if ($cert) {
-    Write-Host "Usługa '$serviceName.exe' jest podpisana certyfikatem. `nCertyfikat Podpisany przez: $($cert.SignerCertificate.Subject)"
+    Write-Host "Usluga '$serviceName.exe' jest podpisana certyfikatem. `nCertyfikat Podpisany przez: $($cert.SignerCertificate.Subject)"
 } else {
-    Write-Host "Usługa '$serviceName.exe' nie jest podpisana certyfikatem. `n"
+    Write-Host "Usluga '$serviceName.exe' nie jest podpisana certyfikatem. `n"
     return
 }
 
 # Dodawanie serwisu do Serwisów Windows
 $binPath = "`"$(Convert-Path $assemblyPath)`""
-Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+# Dodaj korzystajac z sc.exe
+# Start-Process -FilePath "sc.exe" -ArgumentList "create $serviceName binpath= `"$binPath`" DisplayName= `"$serviceDisplayName`" start= auto" -NoNewWindow -Wait
+# Dodaj korzystajac z PowerShell cmdlet
+New-Service -Name $serviceName -BinaryPathName $binPath -DisplayName $serviceDisplayName -StartupType Automatic
 
-# Sprawdzanie stanu serwisu
-Get-Service -Name $serviceName | Select-Object Name, Status
+# Zapisz informacje o utworzeniu serwisu na pulpicie
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$servicesFilePath = Join-Path -Path $desktopPath -ChildPath "CaptoServices.txt"
+$creationDate = Get-Date -Format "MM-dd HH:mm:ss"
+Add-Content -Path $servicesFilePath -Value "Date: $creationDate Name: $serviceName Path: $assemblyPath"
 
-Write-Host "Aby uruchomić wpisz: sc.exe start $serviceName `nJeśli wystąpiły błędy usuń za pomocą: sc.exe delete $serviceName"
+Write-Host "Aby uruchomic wpisz: sc.exe start $serviceName `nJesli wystapily bledy usun za pomoca: sc.exe delete $serviceName `nPlik $serviceName.exe znajduje sie w $assemblyPath"
