@@ -32,3 +32,10 @@ Wyłącza wymienione usługi: "CantStop", "CertService", "RunService", "CaptoPs"
 
 ### Hello.ps1 i HelloVB.ps1
 Przykłady kompilacji programu .exe korzystając z Add-Type w PowerShell. `Hello.ps1` zawiera kod w języku C#, a `HelloVB.ps1` zawiera kod w Visual Basic .NET.
+
+### tcpReverse.ps1
+Skrypt kompiluje prosty reverse shell w języku C#, zainspirowany artykułem: [C# Simple Reverse Shell](https://www.puckiestyle.nl/c-simple-reverse-shell/).
+* Ustaw zmienne `$serverIP` i `$serverPort` na odpowiednie wartości.
+* Skrypt generuje kod C# i kompiluje go do pliku wykonywalnego (.exe)
+
+<img alt="" src=".scs/0.png">

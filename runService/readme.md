@@ -21,7 +21,7 @@ Skrypt zawiera fragment kodu w języku C#, który definiuje logikę działania s
 Skrypt zapisuje kod C# do pliku o nazwie "RunService.cs" w folderze tymczasowym systemu ($env:TEMP). Następnie używa funkcji Add-Type do skompilowania kodu C# do pliku wykonywalnego (.exe) o nazwie "RunService.exe" w tym samym folderze. W trakcie kompilacji podane są wymagane odwołania do biblioteki System.ServiceProcess.dll.
 
 * Dodawanie serwisu do Serwisów Windows
-Po skompilowaniu pliku .exe skrypt uruchamia narzędzie sc.exe (Service Control) w celu utworzenia serwisu systemowego. Wywołanie sc.exe używa parametrów takich jak nazwa serwisu, ścieżka do pliku .exe i wyświetlana nazwa serwisu. Serwis jest tworzony z ustawieniami autostartu i automatycznego uruchamiania.
+Serwis jest tworzony z ustawieniami autostartu i automatycznego uruchamiania.
 
 * Ustawianie opisu serwisu
 Skrypt używa WMI (Windows Management Instrumentation) do pobrania obiektu serwisu o nazwie `$serviceName` i ustawienia opisu serwisu `$serviceDescription`. Zmiany są zapisywane przy użyciu metody Put().
